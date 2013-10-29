@@ -4,7 +4,7 @@ var preloadCount = 0; var PRELOADTOTAL = 2;
 var img_joueur = new Image(); var obj_joueur;
 var speed_joueur_x = 0; var speed_joueur_y = 0;
 var PLAYERMAXSPEEDX = 20; var PLAYERACCX = 1;
-var JUMPSPEED = 50; var JUMPACC = 2;
+var JUMPSPEED = 51; var JUMPACC = 2;
 
 var ACTIVEGRAVITY = true;
 var GRAVITY = 5;
