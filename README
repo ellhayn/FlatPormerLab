@@ -1,0 +1,8 @@
+structure du répertoire
+	  index.html : point d'entrée, à lancer avec un navigateur
+	  TODO : trucs à faire, pseudo-planning
+	  REVIEW : impressions détaillées sur l'existant.
+	  BUGREPORT : listes des bugs et leur état de traitement
+	  js/ : dossier pour les script
+	  media/ : autres ressources (image, sons ...)
+	  doc/ : documentation du projet pour relecture par tiers
