@@ -192,7 +192,7 @@ function mainTick()
     }
     stage.update();
     document.getElementById("PLAYERACCX").innerHTML = PLAYERACCX;
-    document.getElementById("PLAYERACCY").innerHTML = speed_joueur_y;//PLAYERACCY;
+    document.getElementById("PLAYERACCY").innerHTML = PLAYERACCY;
     document.getElementById("PLAYERMAXSPEEDX").innerHTML = PLAYERMAXSPEEDX;
     document.getElementById("GRAVITY").innerHTML = GRAVITY;
     document.getElementById("JUMPPOWER").innerHTML = JUMPPOWER;
