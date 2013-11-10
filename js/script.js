@@ -1,6 +1,7 @@
 var stage;
 var preloadCount = 0; var PRELOADTOTAL = 2;
 var img_bg = new Image(); var obj_bg;
+var p = {}
 
 ////////////////////////////////////////////////////////////////////////////
 // Keyboard management
@@ -20,102 +21,93 @@ var speed_joueur_x = 0; var speed_joueur_y = 0;
 // Gravity engine
 //////////////////////////////////////////////////////////////////////////// 
 
-var ACTIVEGRAVITY = true;
-var PLAYERMAXSPEEDX = 10; var PLAYERACCX = 1; var PLAYERACCY = 1;
-var JUMPPOWER = 20; var NBJUMPMAX = 4; var nb_jump = 0;
-var GROUNDFRICTION = 0.2; var AIRFRICTION = 0.0001;
-var GRAVITY = 2;
-var on_ground = true; var input_x = 0; var input_y = 0;
+// position parameters
+p["PLAYERMINPOSX"] = 0; p["PLAYERMAXPOSX"] = 550;
+p["PLAYERMINPOSY"] = 0; p["PLAYERMAXPOSY"] = 365;
+// speed parameters
+p["PLAYERMINSPEEDX"] = 0; p["PLAYERMAXSPEEDX"] = 10;
+p["PLAYERMINSPEEDY"] = 0; p["PLAYERMAXSPEEDY"] = 100;
+// acceleration parameters
+p["PLAYERACCX"] = 1; p["PLAYERACCY"] = 1;
+// jump management
+p["JUMPPOWER"] = 0; p["NBJUMPMAX"] = 2;
+// physics management
+p["GRAVITY"] = 2; p["GROUNDFRICTION"] = 0.2;
+p["AIRFRICTION"] = 0.0001;
+
+
+function getCorrectValue(new_val, min_val, max_val, epsilon)
+{
+    if (new_val > max_val)
+	return max_val;
+    else if (new_val < min_val)
+	return min_val;
+    else if ((new_val > -epsilon) &&
+	     (new_val < epsilon))
+	return 0;
+    return new_val;
+}
 
 function gravity_event_keydown(e)
 {
-    if ((e.keyCode >= 37) && (e.keyCode <= 40))
+    if ((e.keyCode >= 37) && (e.keyCode <= 40) && !(e.keyCode in touches))
     {
 	e.preventDefault();
-	if (e.keyCode == keynum_DOWNARROW)
-	    input_y--;
-	if (e.keyCode == keynum_UPARROW)
+	if ((e.keyCode == keynum_UPARROW) &&
+	    (nb_jump < p["NBJUMPMAX"]))
 	{
-	    input_y++;
-	    if (!(keynum_UPARROW in touches) && (nb_jump < NBJUMPMAX))
-	    {
-		nb_jump++;
-		if (speed_joueur_y < 0)
-		    speed_joueur_y = -speed_joueur_y;
-		speed_joueur_y -= JUMPPOWER;
-	    }
-	    on_ground = false;
+	    nb_jump++;
+	    speed_joueur_y = -p["JUMPPOWER"];
 	}
-	if (e.keyCode == keynum_LEFTARROW)
-	    input_x--;
-	if (e.keyCode == keynum_RIGHTARROW)
-	    input_x++;
-    }   
-    touches[e.keyCode]=true;
-    return false;
+    }
 }
 
 function gravity_event_keyup(e)
 {
-    if (e.keyCode == keynum_DOWNARROW)
-	input_y++;
-    if (e.keyCode == keynum_UPARROW)
-	input_y--;
-    if (e.keyCode == keynum_LEFTARROW)
-	input_x++;
-    if (e.keyCode == keynum_RIGHTARROW)
-	input_x--;
 }
 
 function gravity_event_tick()
 {
     var friction;
     if (obj_joueur.y >= 365)
-	friction = GROUNDFRICTION;
+	friction = p["GROUNDFRICTION"];
     else
-	friction = AIRFRICTION;
+	friction = p["AIRFRICTION"];
     var acc = 0;
     if (keynum_LEFTARROW in touches)
-	acc -= PLAYERACCX;
+	acc -= p["PLAYERACCX"];
     if (keynum_RIGHTARROW in touches)
-	acc += PLAYERACCX;
-    if (acc==0)
-	speed_joueur_x -= (speed_joueur_x*friction);
-    else
-	speed_joueur_x += acc;
-    if (speed_joueur_x > PLAYERMAXSPEEDX)
-	speed_joueur_x = PLAYERMAXSPEEDX;
-    else if (speed_joueur_x < -PLAYERMAXSPEEDX)
-	speed_joueur_x = -PLAYERMAXSPEEDX;
+	acc += p["PLAYERACCX"];
+    if (acc == 0)
+	acc -= (speed_joueur_x*friction);2
+    speed_joueur_x = getCorrectValue(speed_joueur_x + acc,
+				     -p["PLAYERMAXSPEEDX"],
+				     p["PLAYERMAXSPEEDX"],
+				     p["PLAYERMINSPEEDX"]);
+    speed_joueur_x = getCorrectValue(obj_joueur.x + speed_joueur_x,
+				   p["PLAYERMINPOSX"],
+				   p["PLAYERMAXPOSX"],
+				   0) - obj_joueur.x;
     obj_joueur.x += speed_joueur_x;
-    if (obj_joueur.x < 0)
-    {
-	speed_joueur_x = 0;
-	obj_joueur.x = 0;
-    }
-    else if (obj_joueur.x > 550)
-    {
-	speed_joueur_x = 0;
-	obj_joueur.x = 550;
-    }
     // up arrow
-    speed_joueur_y += GRAVITY;
+    acc = p["GRAVITY"];
     if (keynum_UPARROW in touches)
-	speed_joueur_y -= PLAYERACCY;
+	acc -= p["PLAYERACCY"];
     if (keynum_DOWNARROW in touches)
-	speed_joueur_y += PLAYERACCY;
+	acc += p["PLAYERACCY"];
+    if (acc == 0)
+	acc -= (speed_joueur_y*friction);
+    speed_joueur_y = getCorrectValue(speed_joueur_y + acc,
+				     -p["PLAYERMAXSPEEDY"],
+				     p["PLAYERMAXSPEEDY"],
+				     p["PLAYERMINSPEEDY"]);
+    speed_joueur_y = getCorrectValue(obj_joueur.y + speed_joueur_y,
+				   p["PLAYERMINPOSY"],
+				   p["PLAYERMAXPOSY"],
+				   0) - obj_joueur.y;
     obj_joueur.y += speed_joueur_y;
-    if (obj_joueur.y < 0)
-    {
-	speed_joueur_y = 0;
-	obj_joueur.y = 0;
-    }
-    else if (obj_joueur.y > 365)
-    {
-	speed_joueur_y = 0;
-	obj_joueur.y = 365;
+    if (obj_joueur.y == p["PLAYERMAXPOSY"])
 	nb_jump = 0;
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -125,18 +117,16 @@ function gravity_event_tick()
 addEventListener("keydown",
 		 function(e)
 		 {
-		     if (ACTIVEGRAVITY)
-			 gravity_event_keydown(e);
-		     return false;
+		     gravity_event_keydown(e);
 		     touches[e.keyCode]=true;
+		     return false;
 		 });
 
 addEventListener("keyup",
 		 function (e)
 		 {
 		     delete touches[e.keyCode];
-		     if (ACTIVEGRAVITY)
-			 gravity_event_keyup(e);
+		     gravity_event_keyup(e);
 		 });
 
 function startGame() {preloadAssets();}
@@ -144,11 +134,11 @@ function startGame() {preloadAssets();}
 function preloadAssets()
 {
     img_bg.onload = preloadUpdate()
-    img_bg.src = "media/images/background_road_640x480px.png";
+    img_bg.src = "media/images/background_sky_640x480px.png";
 
     img_joueur.onload = preloadUpdate();
 //    img_joueur.src = "media/joueur.png";
-    img_joueur.src = "media/images/Sprite_kingedmund_115x90px.png";
+    img_joueur.src = "media/images/Sprite_megaman_41x41px.png";
     
 }
 
@@ -175,28 +165,21 @@ function launchGame()
 
 function mainTick()
 {
-    if (ACTIVEGRAVITY)
-    {
-	gravity_event_tick();
-    } else {
-	// vertical move
-	if ((keynum_DOWNARROW in touches) && (obj_joueur.y > 0))
-	    obj_joueur.y -= PLAYERSPEED;
-	else if ((keynum_UPARROW in touches) && (obj_joueur.y < 365))
-	    obj_joueur.y += PLAYERSPEED;
-	//horizontal move
-	if ((keynum_LEFTARROW in touches) && (obj_joueur.x > 0))
-	    obj_joueur.x -= PLAYERSPEED;
-	else if ((keynum_RIGHTARROW in touches) && (obj_joueur.x < 550))
-	    obj_joueur.x += PLAYERSPEED;
-    }
+    gravity_event_tick();
     stage.update();
-    document.getElementById("PLAYERACCX").innerHTML = PLAYERACCX;
-    document.getElementById("PLAYERACCY").innerHTML = PLAYERACCY;
-    document.getElementById("PLAYERMAXSPEEDX").innerHTML = PLAYERMAXSPEEDX;
-    document.getElementById("GRAVITY").innerHTML = GRAVITY;
-    document.getElementById("JUMPPOWER").innerHTML = JUMPPOWER;
-    document.getElementById("GROUNDFRICTION").innerHTML = GROUNDFRICTION;
-    document.getElementById("AIRFRICTION").innerHTML = AIRFRICTION;
-    document.getElementById("NBJUMPMAX").innerHTML = NBJUMPMAX;
+    var st = "<ul>";
+    for (v in p)
+    {
+	var val = Number(document.getElementById(v).value);
+	if (val != NaN)
+	    p[v] = val;
+	else
+	    alert(v+" "+p[v])
+//	st += "<li>"+v+" : "+p[v]+"</li>";
+    }
+    document.getElementById("parameters").innerHTML = st+"</ul>";
+    document.getElementById("obj_joueur.x").innerHTML = obj_joueur.x.toFixed(2);
+    document.getElementById("obj_joueur.y").innerHTML = obj_joueur.y.toFixed(2);
+    document.getElementById("speed_joueur_x").innerHTML = speed_joueur_x.toFixed(2);
+    document.getElementById("speed_joueur_y").innerHTML = speed_joueur_y.toFixed(2);
 }

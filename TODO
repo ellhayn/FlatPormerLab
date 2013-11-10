@@ -4,19 +4,22 @@ Définir un espace de travail (cadre global et résolution = écran fixe 640x480
 Affichage d'une image RGBA (transparence) au format .png dans l'espace de travail ~ "personnage"
 Déplacement à vitesse fixe du personnage
 Affichage d'une image de fond fullscreen (format .png de 640x480px)
+création dune image de fond peu chargées (ex : un ciel et un sol)
+mise en place d'un environnement de travail (git et googledrive)
+     git : programmation
+     google drive : ressources et background
+
+À VALIDER
+
+ajout des fonctions d'accélération et de la notion de gravité pour les objets mobiles (personnages, objets ...)
+mise en place d'un HUD de contrôle des paramètres du code (vitesse de déplacement, constante de gravité, HP ...)
+     affichage des valeurs
+     modification des valeurs en temps réel par l'intermédiaire du HUD
 
 
 À FAIRE
 
 
-création dune image de fond peu chargées (ex : un ciel et un sol)
-mise en place d'un environnement de travail (git et googledrive)
-     git : programmation
-     google drive : ressources et background
-ajout des fonctions d'accélération et de la notion de gravité pour les objets mobiles (personnages, objets ...)
-mise en place d'un HUD de contrôle des paramètres du code (vitesse de déplacement, constante de gravité, HP ...)
-     affichage des valeurs
-     modification des valeurs en temps réel par l'intermédiaire du HUD
 Interactions actives ou passives
      actives : input du joueur pour interagir avec un élément de décor, objet, PNJ ...
      passives : action automatique lors du passage sur un élément de l'environnement (ex : ramassage de bonus, malus, objets...)

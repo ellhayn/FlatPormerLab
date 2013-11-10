@@ -1,0 +1,17 @@
+table
+{
+    border-collapse: collapse;
+}
+td
+{
+    border: 1px solid black;
+}
+th
+{
+    border: 1px solid black;
+}
+li {
+    display: inline-block;
+    list-style: none; /* pour enlever les puces sur IE7 */
+    margin: 10px;
+}
